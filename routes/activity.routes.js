@@ -58,7 +58,7 @@ router.get("/activities/:activityId", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-// RANDOM /api/random-activity - Gets a sperandomcific activity
+// RANDOM /api/random-activity - Gets a random activity
 router.get("/random-activity", async (req, res) => {
   const { type, day } = req.params;
   try {
@@ -77,6 +77,28 @@ router.get("/random-activity", async (req, res) => {
     console.log("whattheerror" + err);
     res.json(err);
   }
+});
+
+// FILTER /api/filter - Filter activities
+router.get("/filter", async (req, res) => {
+  const { type, neighborhood } = req.query;
+  console.log("Type:", { type });
+
+  const conditions = {};
+  if (type) {
+    conditions.type = type;
+  }
+  if (neighborhood) {
+    conditions.neighborhood = neighborhood;
+  }
+  // const activity = await Activity.findOne({ type: "exhibition" });
+  // const activity = await Activity.find({ type: "exhibition" });
+  //
+  // const activity = await Activity.findOne(conditions);
+  // res.status(200).json({ activity });
+  //
+  const activities = await Activity.find(conditions);
+  res.status(200).json(activities);
 });
 
 // PUT /api/activities/:activityId - Updates a specific activity by id
