@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-// const randonizer = require("../helpers/random");
 const { randomRange } = require("../helpers/random");
 
 const Activity = require("../models/Activity.model");
@@ -54,7 +53,10 @@ router.get("/activities/:activityId", (req, res) => {
 
   Activity.findById(activityId)
     // .populate("user")
-    .then((activity) => res.status(200).json(activity))
+    .then((activity) => {
+      res.status(200).json(activity);
+    })
+
     .catch((err) => res.json(err));
 });
 
@@ -74,14 +76,13 @@ router.get("/random-activity", async (req, res) => {
 
     res.status(200).json(randomActivity);
   } catch (err) {
-    console.log("whattheerror" + err);
     res.json(err);
   }
 });
 
 // FILTER /api/filter - Filter activities
 router.get("/filter", async (req, res) => {
-  const { type, neighborhood } = req.query;
+  const { type, neighborhood, time, space } = req.query;
   console.log("Type:", { type });
 
   const conditions = {};
@@ -90,6 +91,12 @@ router.get("/filter", async (req, res) => {
   }
   if (neighborhood) {
     conditions.neighborhood = neighborhood;
+  }
+  if (time) {
+    conditions.time = time;
+  }
+  if (space) {
+    conditions.space = space;
   }
   // const activity = await Activity.findOne({ type: "exhibition" });
   // const activity = await Activity.find({ type: "exhibition" });

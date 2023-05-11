@@ -1,5 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const jwt = require("jsonwebtoken");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
@@ -112,6 +113,27 @@ router.post("/login", (req, res) => {
 router.get("/verify", isAuthenticated, (req, res) => {
   console.log("req.payload", req.payload);
   res.status(200).json(req.payload);
+});
+
+//
+//
+// GET /auth/profile - PROFILE
+
+router.get("/profile/:userId", (req, res) => {
+  const { userId } = req.params;
+
+  // This could be a helper function beacuse we use it many times. Or add at the end?
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    res.status(400).json({ message: "Specified profile id is not valid" });
+    return;
+  }
+
+  User.findById(userId)
+    .then((user) => {
+      res.status(200).json(user);
+    })
+
+    .catch((err) => res.json(err));
 });
 
 module.exports = router;
