@@ -46,7 +46,7 @@ router.get("/activities", (req, res, next) => {
 });
 
 // GET /api/activities/:activityId - Retrieves a specific activity by id
-router.get("/activities/:activityId", getUser, async (req, res) => {
+router.get("/activities/:activityId", async (req, res) => {
   const { activityId } = req.params;
   let favs = [];
 
