@@ -18,6 +18,11 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  favs: {
+    type: Array,
+    default: [],
+  },
+  activities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Activity" }],
 });
 
 module.exports = model("User", userSchema);

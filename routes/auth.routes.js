@@ -1,11 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const router = express.Router();
 const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const jwt = require("jsonwebtoken");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
-const router = express.Router();
 const saltRounds = 10;
 
 //
@@ -122,6 +122,7 @@ router.get("/verify", isAuthenticated, (req, res) => {
 router.get("/profile/:userId", (req, res) => {
   const { userId } = req.params;
 
+  console.log("User ID in route profile/userid", userId);
   // This could be a helper function beacuse we use it many times. Or add at the end?
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     res.status(400).json({ message: "Specified profile id is not valid" });

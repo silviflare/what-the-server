@@ -4,7 +4,8 @@ const mongoose = require("mongoose");
 const { randomRange } = require("../helpers/random");
 
 const Activity = require("../models/Activity.model");
-// const User = require("../models/User.model");
+const User = require("../models/User.model");
+const { isAuthenticated, getUser } = require("../middlewares/jwt.middleware");
 
 // POST /api/activities - Creates a new activity
 router.post("/activities", (req, res, next) => {
@@ -19,6 +20,8 @@ router.post("/activities", (req, res, next) => {
     time,
   } = req.body;
 
+  const userId = req.user._id;
+
   Activity.create({
     name,
     description,
@@ -28,6 +31,7 @@ router.post("/activities", (req, res, next) => {
     neighborhood,
     space,
     time,
+    createdBy: userId,
   })
     .then((response) => res.json(response))
     .catch((err) => res.json(err));
@@ -42,19 +46,31 @@ router.get("/activities", (req, res, next) => {
 });
 
 // GET /api/activities/:activityId - Retrieves a specific activity by id
-router.get("/activities/:activityId", (req, res) => {
+router.get("/activities/:activityId", getUser, async (req, res) => {
   const { activityId } = req.params;
+  let favs = [];
+
+  if (req.userTokenData) {
+    console.log("UserToken!!!!", req.userTokenData);
+    const userToken = req.userTokenData;
+    const user = await User.findById(userToken._id);
+    console.log("User!!!!!!!!", user, userToken);
+    favs = user?.favs || [];
+  }
 
   // This could be a helper function beacuse we use it many times. Or add at the end?
   if (!mongoose.Types.ObjectId.isValid(activityId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-
+  console.log(favs, activityId);
   Activity.findById(activityId)
     // .populate("user")
     .then((activity) => {
-      res.status(200).json(activity);
+      res
+        .status(200)
+        .json({ ...activity.toJSON(), isLiked: favs.includes(activityId) });
+      // res.status(200).json(activity);
     })
 
     .catch((err) => res.json(err));
@@ -130,6 +146,30 @@ router.delete("/activities/:activityId", (req, res) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+});
+
+//
+//
+// FAVS
+
+router.get("/like/:activityId", isAuthenticated, async (req, res) => {
+  const { activityId } = req.params;
+  const userId = req.userTokenData._id;
+
+  const user = await User.findById(userId);
+
+  let favs = user.favs || [];
+
+  if (favs.includes(activityId)) {
+    favs = favs.filter((fav) => fav !== activityId);
+  } else {
+    favs.push(activityId);
+  }
+
+  // console.log("hola favs", favs);
+
+  await User.findByIdAndUpdate(userId, { favs });
+  res.status(200).json(favs);
 });
 
 module.exports = router;

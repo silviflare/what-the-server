@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const { Schema, model } = require("mongoose");
 
 const activitySchema = new Schema({
@@ -39,10 +40,7 @@ const activitySchema = new Schema({
     type: String,
     enum: ["morning", "afternoon", "evening", "night"],
   },
-  //   owner: {
-  //     type: Schema.Types.ObjectId,
-  //     ref: "User",
-  //   },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
 const Activity = model("Activity", activitySchema);
