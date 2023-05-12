@@ -91,7 +91,6 @@ router.post("/login", (req, res) => {
         const { _id, email, name } = foundUser;
 
         const payload = { _id, email, name };
-        console.log("PAYLOAD: ", payload);
         // Create and sign the token
         const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
           algorithm: "HS256",
@@ -111,7 +110,6 @@ router.post("/login", (req, res) => {
 // GET /auth/verify - VERIFY
 // Used to verify JWT stored on the client
 router.get("/verify", isAuthenticated, (req, res) => {
-  console.log("req.payload", req.userTokenData);
   res.status(200).json(req.userTokenData);
 });
 
@@ -120,8 +118,6 @@ router.get("/verify", isAuthenticated, (req, res) => {
 // GET /auth/profile - PROFILE
 
 router.get("/profile", isAuthenticated, (req, res) => {
-  console.log("User ID in route profile/userid", req.userTokenData);
-
   const userTokenId = req.userTokenData._id;
 
   // This could be a helper function beacuse we use it many times. Or add at the end?
@@ -131,6 +127,7 @@ router.get("/profile", isAuthenticated, (req, res) => {
   }
 
   User.findById(userTokenId)
+    .populate("activities")
     .then((user) => {
       res.status(200).json(user);
     })

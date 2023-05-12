@@ -7,13 +7,13 @@ const isAuthenticated = jwt({
   getToken: getTokenFromHeaders,
 });
 
-const getUser = jwt({
+/* const getUser = jwt({
   secret: process.env.TOKEN_SECRET,
   algorithms: ["HS256"],
   requestProperty: "userTokenData",
   getToken: getTokenFromHeaders,
   credentialsRequired: false,
-});
+}); */
 
 // Function used to extract the JWT token from the request's "Authorization" Headers
 function getTokenFromHeaders(req) {
@@ -27,4 +27,4 @@ function getTokenFromHeaders(req) {
   return null;
 }
 
-module.exports = { isAuthenticated, getUser };
+module.exports = { isAuthenticated };

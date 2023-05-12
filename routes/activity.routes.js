@@ -5,10 +5,10 @@ const { randomRange } = require("../helpers/random");
 
 const Activity = require("../models/Activity.model");
 const User = require("../models/User.model");
-const { isAuthenticated, getUser } = require("../middlewares/jwt.middleware");
+const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
 // POST /api/activities - Creates a new activity
-router.post("/activities", (req, res, next) => {
+router.post("/activities", isAuthenticated, (req, res, next) => {
   const {
     name,
     description,
@@ -20,7 +20,7 @@ router.post("/activities", (req, res, next) => {
     time,
   } = req.body;
 
-  const userId = req.user._id;
+  const userId = req.userTokenData._id;
 
   Activity.create({
     name,
@@ -51,10 +51,8 @@ router.get("/activities/:activityId", async (req, res) => {
   let favs = [];
 
   if (req.userTokenData) {
-    console.log("UserToken!!!!", req.userTokenData);
     const userToken = req.userTokenData;
     const user = await User.findById(userToken._id);
-    console.log("User!!!!!!!!", user, userToken);
     favs = user?.favs || [];
   }
 
@@ -99,7 +97,6 @@ router.get("/random-activity", async (req, res) => {
 // FILTER /api/filter - Filter activities
 router.get("/filter", async (req, res) => {
   const { type, neighborhood, time, space } = req.query;
-  console.log("Type:", { type });
 
   const conditions = {};
   if (type) {
@@ -166,10 +163,37 @@ router.get("/like/:activityId", isAuthenticated, async (req, res) => {
     favs.push(activityId);
   }
 
-  // console.log("hola favs", favs);
-
   await User.findByIdAndUpdate(userId, { favs });
   res.status(200).json(favs);
+});
+
+//
+//
+// Get Activities from FAVS
+
+router.get("/myFavs", isAuthenticated, async (req, res) => {
+  const { activityId } = req.params;
+  const userId = req.userTokenData._id;
+
+  const user = await User.findById(userId);
+
+  let favs = user.favs || [];
+
+  const activities = await Activity.find({ _id: { $in: favs } });
+
+  res.status(200).json(activities);
+});
+
+//
+//
+// Get MY Activities
+
+router.get("/myActivities", isAuthenticated, async (req, res) => {
+  const userId = req.userTokenData._id;
+
+  const activities = await Activity.find({ createdBy: userId });
+
+  res.status(200).json(activities);
 });
 
 module.exports = router;

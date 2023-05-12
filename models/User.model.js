@@ -22,7 +22,7 @@ const userSchema = new Schema({
     type: Array,
     default: [],
   },
-  activities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Activity" }],
+  // activities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Activity" }],
 });
 
 module.exports = model("User", userSchema);
