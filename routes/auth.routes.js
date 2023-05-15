@@ -127,7 +127,7 @@ router.get("/profile", isAuthenticated, (req, res) => {
   }
 
   User.findById(userTokenId)
-    .populate("activities")
+    // .populate("activities")
     .then((user) => {
       res.status(200).json(user);
     })

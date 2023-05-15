@@ -65,6 +65,7 @@ router.get("/activities/:activityId", async (req, res) => {
   Activity.findById(activityId)
     // .populate("user")
     .then((activity) => {
+      console.log("hier activity in route!!!!!!!!!", activity);
       res
         .status(200)
         .json({ ...activity.toJSON(), isLiked: favs.includes(activityId) });
@@ -76,9 +77,26 @@ router.get("/activities/:activityId", async (req, res) => {
 
 // RANDOM /api/random-activity - Gets a random activity
 router.get("/random-activity", async (req, res) => {
-  const { type, day } = req.params;
+  const { type, neighborhood, time, space } = req.query;
+
+  const conditions = {};
+  if (type) {
+    // conditions.type = type;
+    conditions.type = { $in: type };
+  }
+  if (neighborhood) {
+    conditions.neighborhood = neighborhood;
+  }
+  if (time) {
+    // conditions.time = time;
+    conditions.time = { $in: time };
+  }
+  if (space) {
+    conditions.space = space;
+  }
+  console.log("conditionssssssssssssssssssss", conditions);
   try {
-    const totalCountActivites = await Activity.countDocuments();
+    const totalCountActivites = await Activity.countDocuments(conditions);
     const randomIndex = randomRange(0, totalCountActivites);
 
     // if(type){
@@ -86,7 +104,8 @@ router.get("/random-activity", async (req, res) => {
     // }
     // console.log({ type });
 
-    const randomActivity = await Activity.findOne().skip(randomIndex);
+    // const randomActivity = await Activity.findOne(conditions).skip(randomIndex);
+    const randomActivity = await Activity.findOne(conditions).skip(randomIndex);
 
     res.status(200).json(randomActivity);
   } catch (err) {

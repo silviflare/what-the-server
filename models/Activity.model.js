@@ -13,7 +13,7 @@ const activitySchema = new Schema({
   address: String,
   mapsLink: String,
   type: {
-    type: String,
+    type: [String],
     enum: [
       "food",
       "drink",
@@ -37,7 +37,7 @@ const activitySchema = new Schema({
     required: true,
   },
   time: {
-    type: String,
+    type: [String],
     enum: ["morning", "afternoon", "evening", "night"],
   },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
