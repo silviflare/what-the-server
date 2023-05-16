@@ -158,8 +158,6 @@ router.get("/filter", getUser, async (req, res) => {
     isLiked: favs.includes(activity._id),
   }));
 
-  console.log("hier in activity filter route!!!!!!!!!", activtitesWithLikes);
-
   res.status(200).json(activtitesWithLikes);
 });
 
