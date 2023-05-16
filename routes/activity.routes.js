@@ -5,7 +5,7 @@ const { randomRange } = require("../helpers/random");
 
 const Activity = require("../models/Activity.model");
 const User = require("../models/User.model");
-const { isAuthenticated } = require("../middlewares/jwt.middleware");
+const { isAuthenticated, getUser } = require("../middlewares/jwt.middleware");
 
 // POST /api/activities - Creates a new activity
 router.post("/activities", isAuthenticated, (req, res, next) => {
@@ -46,7 +46,7 @@ router.get("/activities", (req, res, next) => {
 });
 
 // GET /api/activities/:activityId - Retrieves a specific activity by id
-router.get("/activities/:activityId", async (req, res) => {
+router.get("/activities/:activityId", getUser, async (req, res) => {
   const { activityId } = req.params;
   let favs = [];
 
@@ -65,7 +65,6 @@ router.get("/activities/:activityId", async (req, res) => {
   Activity.findById(activityId)
     // .populate("user")
     .then((activity) => {
-      console.log("hier activity in route!!!!!!!!!", activity);
       res
         .status(200)
         .json({ ...activity.toJSON(), isLiked: favs.includes(activityId) });
@@ -114,8 +113,22 @@ router.get("/random-activity", async (req, res) => {
 });
 
 // FILTER /api/filter - Filter activities
-router.get("/filter", async (req, res) => {
+router.get("/filter", getUser, async (req, res) => {
   const { type, neighborhood, time, space } = req.query;
+
+  let favs = [];
+
+  if (req.userTokenData) {
+    const userToken = req.userTokenData;
+    const user = await User.findById(userToken._id);
+    favs = user?.favs || [];
+  }
+
+  console.log(
+    "hier in activity filter route!!!!!!!!!",
+    favs,
+    req.userTokenData
+  );
 
   const conditions = {};
   if (type) {
@@ -130,14 +143,24 @@ router.get("/filter", async (req, res) => {
   if (space) {
     conditions.space = space;
   }
+
+  // If I wanted to show just one activity
+  //
   // const activity = await Activity.findOne({ type: "exhibition" });
   // const activity = await Activity.find({ type: "exhibition" });
   //
   // const activity = await Activity.findOne(conditions);
   // res.status(200).json({ activity });
-  //
+
   const activities = await Activity.find(conditions);
-  res.status(200).json(activities);
+  const activtitesWithLikes = activities.map((activity) => ({
+    ...activity.toJSON(),
+    isLiked: favs.includes(activity._id),
+  }));
+
+  console.log("hier in activity filter route!!!!!!!!!", activtitesWithLikes);
+
+  res.status(200).json(activtitesWithLikes);
 });
 
 // PUT /api/activities/:activityId - Updates a specific activity by id
@@ -200,7 +223,12 @@ router.get("/myFavs", isAuthenticated, async (req, res) => {
 
   const activities = await Activity.find({ _id: { $in: favs } });
 
-  res.status(200).json(activities);
+  const activtitesWithLikes = activities.map((activity) => ({
+    ...activity.toJSON(),
+    isLiked: favs.includes(activity._id),
+  }));
+
+  res.status(200).json(activtitesWithLikes);
 });
 
 //
