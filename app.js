@@ -11,18 +11,6 @@ const express = require("express");
 
 const app = express();
 
-// ℹ️ Here for Material UI themes
-
-/* import { ThemeProvider, createTheme } from '@mui/material';
-
-const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#ff0000', // Replace with your desired color
-      },
-    },
-  }); */
-
 // ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
 require("./config")(app);
 
