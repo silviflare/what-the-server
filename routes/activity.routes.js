@@ -61,7 +61,6 @@ router.get("/activities/:activityId", getUser, async (req, res) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
-  console.log(favs, activityId);
   Activity.findById(activityId)
     // .populate("user")
     .then((activity) => {
@@ -93,7 +92,6 @@ router.get("/random-activity", async (req, res) => {
   if (space) {
     conditions.space = space;
   }
-  console.log("conditionssssssssssssssssssss", conditions);
   try {
     const totalCountActivites = await Activity.countDocuments(conditions);
     const randomIndex = randomRange(0, totalCountActivites);
