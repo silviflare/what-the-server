@@ -122,12 +122,6 @@ router.get("/filter", getUser, async (req, res) => {
     favs = user?.favs || [];
   }
 
-  console.log(
-    "hier in activity filter route!!!!!!!!!",
-    favs,
-    req.userTokenData
-  );
-
   const conditions = {};
   if (type) {
     conditions.type = type;
