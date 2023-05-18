@@ -93,8 +93,8 @@ router.get("/random-activity", async (req, res) => {
     conditions.space = space;
   }
   try {
-    const totalCountActivites = await Activity.countDocuments(conditions);
-    const randomIndex = randomRange(0, totalCountActivites);
+    const totalCountActivities = await Activity.countDocuments(conditions);
+    const randomIndex = randomRange(0, totalCountActivities);
 
     // if(type){
     //   await Activity.findOne().skip(randomIndex);
@@ -124,13 +124,15 @@ router.get("/filter", getUser, async (req, res) => {
 
   const conditions = {};
   if (type) {
-    conditions.type = type;
+    // conditions.type = type;
+    conditions.type = { $in: type };
   }
   if (neighborhood) {
     conditions.neighborhood = neighborhood;
   }
   if (time) {
-    conditions.time = time;
+    // conditions.time = time;
+    conditions.time = { $in: time };
   }
   if (space) {
     conditions.space = space;
