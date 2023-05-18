@@ -168,13 +168,16 @@ router.put("/activities/:activityId", (req, res) => {
 });
 
 // DELETE /api/activities/:activityId - Delete a specific activity by id
-router.delete("/activities/:activityId", (req, res) => {
+router.delete("/activities/:activityId", async (req, res) => {
   const { activityId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(activityId)) {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+
+  await Activity.findByIdAndDelete(activityId);
+  res.json({ success: true });
 });
 
 //

@@ -16,7 +16,7 @@ const activitySchema = new Schema({
     type: [String],
     enum: [
       "food",
-      "drink",
+      "drinks",
       "exhibition",
       "party",
       "sport",
@@ -25,6 +25,8 @@ const activitySchema = new Schema({
       "market",
       "tour",
       "shop",
+      "market",
+      "exploration",
     ],
     required: true,
   },
