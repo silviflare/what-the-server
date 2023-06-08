@@ -61,6 +61,7 @@ router.get("/activities/:activityId", getUser, async (req, res) => {
     res.status(400).json({ message: "Specified id is not valid" });
     return;
   }
+
   Activity.findById(activityId)
     // .populate("user")
     .then((activity) => {
